@@ -20,14 +20,34 @@ namespace MyCourse
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsDevelopment())
+             if (env.IsEnvironment("Production")){
+            app.UseHttpsRedirection();
+            }
+
+            //PRIMO MIDDLEWARE
+
+            //if (env.IsDevelopment())
+            // usato solo se l'app è in via di sviluppo cioè Development
+            
+            if(env.IsEnvironment("Development"))
             {
+                //pagina informativa con dettagli dell'errore, 
+                //cattura errori dal secondo middleware in poi 
                 app.UseDeveloperExceptionPage();
             }
 
+            //secondo middleware
+            app.UseStaticFiles(); // raggiungi i file statici
+
+            // Terzo MIDDLEWARE
             app.Run(async (context) =>
             {
-                await context.Response.WriteAsync("Hello World!");
+                /*Il httpContext context = Ogni volta che arriva una richiesta web, 
+                il web server produce un oggetto che permetterà 
+                all'applicazione di leggere le informazioni 
+                contenute nella richiesta e di produrre una risposta. */
+                string nome = context.Request.Query["nome"];
+                await context.Response.WriteAsync($"Ciao {nome.ToUpper()}");
             });
         }
     }
